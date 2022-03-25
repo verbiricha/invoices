@@ -1,0 +1,6 @@
+.next
+.husky
+.idea
+package.json
+node_modules
+*.svg

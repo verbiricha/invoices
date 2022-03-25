@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model invoices {
+  id         Int      @id @default(autoincrement())
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  short_id   String   @unique @db.VarChar(32)
+  user_id    String   @db.Uuid
+  invoice_id String   @db.Uuid
+  issuer     String   @db.VarChar(200)
+  customer   String   @db.VarChar(200)
+  memo       String   @db.VarChar(200)
+  due_date   DateTime @db.Date
+  amount     String
+  currency   String   @db.VarChar(4)
+  quotes     quotes?
+}
+
+model quotes {
+  id               Int      @id @default(autoincrement())
+  quote_id         String   @db.Uuid
+  invoice_short_id String   @unique @db.VarChar(32)
+  ln               String
+  onchain          String?
+  amount           String?
+  expiration       DateTime @db.Timestamp(6)
+  invoices         invoices @relation(fields: [invoice_short_id], references: [short_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+enum invoice_status {
+  UNPAID
+  PAID
+  EXPIRED
+}
