@@ -87,12 +87,12 @@ const QuoteDisplay = ({ scheme, setScheme, ln, amount, onchain, expiration }: Qu
       </Box>
 
       {isExpired && (
-        <Text fontFamily="monospace" fontSize="sm" color="red.500">
+        <Text fontSize="sm" color="red.500">
           Expired, please refresh
         </Text>
       )}
       {!isExpired && (
-        <Text fontFamily="monospace" fontSize="sm" color="orange.500">
+        <Text fontSize="sm" sx={{ fontFeatureSettings: '"tnum"' }} color="orange.500">
           Expires in {timeRemaining.toFixed()} seconds
         </Text>
       )}

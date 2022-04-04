@@ -4,7 +4,12 @@ import { StrikeLogo } from '../Icons'
 
 export const Header = () => {
   return (
-    <Box display="flex" m={4} justifyContent="center">
+    <Box
+      alignSelf="flex-end"
+      display="flex"
+      m={4}
+      justifyContent="center"
+      width="100%">
       <StrikeLogo />
     </Box>
   )

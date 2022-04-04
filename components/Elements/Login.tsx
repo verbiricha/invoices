@@ -8,7 +8,7 @@ export const Login = () => {
       flexDirection="column"
       alignItems="center"
       justifyContent="center"
-      height="80vh">
+      height="86vh">
       <Flex
         p={4}
         height="50%"

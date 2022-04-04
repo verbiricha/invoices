@@ -17,7 +17,8 @@ model invoices {
   customer   String   @db.VarChar(200)
   memo       String   @db.VarChar(200)
   due_date   DateTime @db.Date
-  amount     String
+  paid       Boolean  @default(false)
+  amount     Decimal  @db.Decimal
   currency   String   @db.VarChar(4)
   quotes     quotes?
 }
@@ -28,7 +29,7 @@ model quotes {
   invoice_short_id String   @unique @db.VarChar(32)
   ln               String
   onchain          String?
-  amount           String?
+  amount           Decimal? @db.Decimal
   expiration       DateTime @db.Timestamp(6)
   invoices         invoices @relation(fields: [invoice_short_id], references: [short_id], onDelete: NoAction, onUpdate: NoAction)
 }

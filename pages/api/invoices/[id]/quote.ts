@@ -12,7 +12,9 @@ export default async (req: NextApiRequest, res: NextApiResponse<any>) => {
   if (session) {
     if (req.method === 'GET') {
       const invoice = await getInvoice(id)
-      if (invoice.status === 'EXPIRED' || invoice.status === 'PAID') {
+      if (!invoice) {
+        res.status(404)
+      } else if (invoice.status === 'EXPIRED' || invoice.status === 'PAID') {
         res.status(404).json({ error: 'Quote not found' })
       } else {
         const quote = await getQuote(id)

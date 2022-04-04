@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useIntl } from 'react-intl'
+import cache from 'memory-cache'
 
 import { useSession, signOut } from 'next-auth/react'
 import {
@@ -19,10 +20,11 @@ import {
   Text,
   Heading,
   Stack,
+  HStack,
   Link,
   useDisclosure,
 } from '@chakra-ui/react'
-import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
+import { AddIcon, ChevronDownIcon, ArrowLeftIcon, ArrowRightIcon } from '@chakra-ui/icons'
 
 import { CreateInvoice } from './CreateInvoice'
 import { ALL, PAID, UNPAID, EXPIRED } from 'lib/types'
@@ -70,17 +72,35 @@ const InvoiceStatus = ({ status, setStatus }: InvoiceStatusProps) => {
 }
 
 interface InvoicesTableProps {
+  isFetching?: boolean
   invoices: Invoice[]
 }
 
-const InvoicesTable = ({ invoices }: InvoicesTableProps) => {
+const InvoicesTable = ({ isFetching, invoices }: InvoicesTableProps) => {
   const intl = useIntl()
 
-  if (invoices.length === 0) {
+  if (isFetching) {
     return (
-      <Flex padding={40} justifyContent="center">
-        <Text>No invoices available</Text>
-      </Flex>
+      <Text
+        align="center"
+        fontSize={{ base: "sm", md: "2xl" }}
+        color="gray.500"
+        mt={150}
+        justifyContent="center">
+        Fetching invoices...
+      </Text>
+    )
+  }
+  if (invoices.length === 0 && !isFetching) {
+    return (
+      <Text
+        align="center"
+        fontSize={{ base: "md", md: "2xl" }}
+        color="gray.500"
+        mt={150}
+        justifyContent="center">
+        No invoices available
+      </Text>
     )
   }
 
@@ -190,46 +210,75 @@ const UserDropdown = ({ name, avatarUrl }: UserDropdownProps) => {
 
 interface InvoicesProps {
   user: User
-  invoices: Invoice[]
 }
 
-export const Invoices = ({ user, invoices }: InvoicesProps) => {
+export const Invoices = ({ user }: InvoicesProps) => {
   const { data: session } = useSession()
-  const [theInvoices, setInvoices] = useState(invoices)
+  const [invoices, setInvoices] = useState([])
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
   const [status, setStatus] = useState<InvoiceStatuses>(PAID)
+  const [isFetching, setIsFetching] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const currencies = user.currencies.filter(({ isInvoiceable }) => isInvoiceable).map(({ currency }) => currency)
-  const tableInvoices = status === ALL ? theInvoices : theInvoices.filter((i) => i.status === status)
 
-  const changeStatus = (s: InvoiceStatuses) => {
-    setStatus(s)
-    fetchInvoices()
-  }
+  const fetchInvoices = (s: InvoiceStatuses, page: number) => {
+    const url = s === ALL ? `/api/invoices?page=${page}` : `/api/invoices?status=${s}&page=${page}`
 
-  const fetchInvoices = () => {
-    fetch('/api/invoices')
+    const cached = cache.get(url)
+    if (cached) {
+      setTotalPages(Math.ceil(cached.count / 10))
+      setInvoices(cached.invoices)
+      return
+    }
+
+    setIsFetching(true)
+    fetch(url)
     .then((r) => r.json())
-    .then((invoices) => {
+    .then(({ count, invoices }) => {
+      cache.put(url, { count, invoices }, 10 * 1000)
+      setTotalPages(Math.ceil(count / 10))
       setInvoices(invoices)
+      setIsFetching(false)
     })
     .catch((err) => {
+      setIsFetching(false)
       console.error(err)
     })
   }
 
+  const changeStatus = (s: InvoiceStatuses) => {
+    setStatus(s)
+    setPage(1)
+  }
+
+  useEffect(() => {
+    fetchInvoices(status, page)
+  }, [status, page])
+
   const onCloseCreate = () => {
     onClose()
-    fetchInvoices()
+    fetchInvoices(status, page)
   }
 
   return (
     <>
-      <Flex mb={6} alignItems="center" justifyContent="space-between">
+      <Flex
+        mb={6}
+        alignItems="center"
+        justifyContent="space-between"
+        flexDirection={{ base: "column-reverse", sm: "row" }}
+      >
         <Box>
           <Heading as="h1">Invoices</Heading>
         </Box>
-        {session && session.user && <UserDropdown name={session.user.name || ""} avatarUrl={user.avatarUrl} />}
+        {session && session.user && (
+          <UserDropdown
+            name={session.user.name || ""}
+            avatarUrl={user.avatarUrl}
+            />
+        )}
       </Flex>
       <Text>Review your invoices generated with Strike</Text>
       <Flex mb={4} alignItems="center" justifyContent="space-between">
@@ -243,7 +292,32 @@ export const Invoices = ({ user, invoices }: InvoicesProps) => {
       </Flex>
 
       <InvoiceStatus status={status} setStatus={changeStatus} />
-      <InvoicesTable invoices={tableInvoices} />
+      <Flex height="600px" flexDirection="column" position="relative">
+        <InvoicesTable isFetching={isFetching} invoices={invoices} />
+      </Flex>
+
+      <Flex alignItems="center" height="40px" justifyContent="center" mt={4}>
+        {totalPages !== 0 && !isFetching && (
+          <HStack spacing={3}>
+            <Button 
+              isDisabled={page <= 1}
+              onClick={() => setPage(page - 1)}>
+              <ArrowLeftIcon />
+            </Button>
+            <Box>
+              <Text textAlign="center">
+                <Text as="span" fontWeight="bold">{page}</Text> / {totalPages}
+              </Text>
+            </Box>
+            <Button 
+              isDisabled={page === totalPages || invoices.length === 0}
+              onClick={() => setPage(page + 1)}>
+              <ArrowRightIcon />
+            </Button>
+          </HStack>
+        )}
+      </Flex>
+
 
       <CreateInvoice currencies={currencies} isOpen={isOpen} onClose={onCloseCreate} />
     </>

@@ -102,7 +102,7 @@ const ShareInvoice = ({ onClose, email, shortId }: ShareInvoiceProps) => {
   const { host, protocol } = typeof window !== 'undefined' ? window.location : { host: '', protocol: 'http:' }
   const invoiceUrl = `${protocol}//${host}/invoices/${shortId}`
 
-  const noop = () => return 
+  const noop = () => null
   const { copied, copy } = useCopy()
 
   const actions = (
@@ -186,7 +186,7 @@ export const CreateInvoice = ({ currencies,  isOpen, onClose }: CreateInvoicePro
       },
       body: JSON.stringify({
         issuer,
-        amount,
+        amount: Number(amount),
         currency,
         customer,
         memo,
@@ -219,7 +219,7 @@ export const CreateInvoice = ({ currencies,  isOpen, onClose }: CreateInvoicePro
       <Text fontWeight="bold" color="gray.500" mb={2}>Customer Email (optional)</Text>
       <Input
         name="customer-email"
-        value={email}
+        value={email || ''}
         onChange={inputChange(setEmail)}
         type="email"
         placeholder="manuela@strike.me"
@@ -288,7 +288,7 @@ export const CreateInvoice = ({ currencies,  isOpen, onClose }: CreateInvoicePro
         issuer={issuer}
         customer={customer}
         currency={currency}
-        amount={amount} 
+        amount={Number(amount)}
         dueDate={new Date(dueDate)}
         memo={memo}
       />

@@ -1,20 +1,19 @@
 import { useEffect } from 'react'
 
+import Head from 'next/head'
 import { Container } from '@chakra-ui/react'
 import type { NextPage, GetServerSideProps } from 'next'
 import { useSession, getSession, signIn, signOut } from 'next-auth/react'
 
 import { Login, Invoices } from 'components'
 import { getProfileById } from 'lib/api'
-import { getInvoices } from 'lib/invoices'
 import type { User, Invoice } from 'lib/types'
 
 interface HomeProps {
   user: User
-  invoices: any
 }
 
-const Home: NextPage<HomeProps> = ({ invoices, user }) => {
+const Home: NextPage<HomeProps> = ({ user }) => {
   const { data: session } = useSession()
   useEffect(() => {
     if (session?.error === 'RefreshAccessTokenError') {
@@ -23,9 +22,16 @@ const Home: NextPage<HomeProps> = ({ invoices, user }) => {
   }, [session])
 
   return (
-    <Container maxW="container.xl">
-      {session ? <Invoices invoices={invoices} user={user} /> : <Login />}
-    </Container>
+    <>
+      <Head>
+        <title>
+        {session ? `Invoices - ${session.user.name}` : "Log in with Strike"}
+        </title>
+      </Head>
+      <Container maxW="container.xl">
+        {session ? <Invoices user={user} /> : <Login />}
+      </Container>
+    </>
   )
 }
 
@@ -37,8 +43,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     // @ts-expect-error
     const userId = session.user.id
     const user = await getProfileById(userId)
-    const invoices = await getInvoices(userId)
-    return { props: { invoices, user } }
+    return { props: { user } }
   } else {
     return { props:{  } }
   }

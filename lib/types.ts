@@ -19,7 +19,7 @@ export interface Invoice {
   shortId: string
   issuer: string
   customer: string
-  amount: string
+  amount: number
   currency: string
   dueDate: Date
   createdAt?: Date
@@ -30,6 +30,6 @@ export interface Invoice {
 export interface Quote {
   ln: string
   onchain?: string
-  amount?: string
+  amount?: number
   expiration: string
 }
