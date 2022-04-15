@@ -300,16 +300,18 @@ export const Invoices = ({ user }: InvoicesProps) => {
         {totalPages !== 0 && !isFetching && (
           <HStack spacing={3}>
             <Button 
+              size="sm"
               isDisabled={page <= 1}
               onClick={() => setPage(page - 1)}>
               <ArrowLeftIcon />
             </Button>
             <Box>
-              <Text textAlign="center">
-                <Text as="span" fontWeight="bold">{page}</Text> / {totalPages}
+              <Text fontSize="sm" textAlign="center">
+                {page} / {totalPages}
               </Text>
             </Box>
             <Button 
+              size="sm"
               isDisabled={page === totalPages || invoices.length === 0}
               onClick={() => setPage(page + 1)}>
               <ArrowRightIcon />
