@@ -271,7 +271,7 @@ export const Invoices = ({ user }: InvoicesProps) => {
         flexDirection={{ base: "column-reverse", sm: "row" }}
       >
         <Box>
-          <Heading as="h1">Invoices</Heading>
+          <Heading as="h1" mt={2}>Invoices</Heading>
         </Box>
         {session && session.user && (
           <UserDropdown
@@ -280,11 +280,15 @@ export const Invoices = ({ user }: InvoicesProps) => {
             />
         )}
       </Flex>
-      <Text>Review your invoices generated with Strike</Text>
-      <Flex mb={4} alignItems="center" justifyContent="space-between">
+      <Text mb={2}>Review your invoices generated with Strike</Text>
+      <Flex
+        mb={4}
+        alignItems="center"
+        justifyContent="space-between"
+      >
         <Box></Box>
         <Box>
-          <Button colorScheme="brand" variant="outline" onClick={onOpen}>
+          <Button mt={2} colorScheme="brand" variant="outline" onClick={onOpen}>
             <Text color="white">Create Invoice</Text>
             <AddIcon ml={2} color="white" />
           </Button>
