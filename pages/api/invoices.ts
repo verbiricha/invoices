@@ -31,7 +31,7 @@ export default async (req: NextApiRequest, res: NextApiResponse<any>) => {
     if (req.method === 'POST') {
       const { handle } = await getProfileById(userId)
       const invoiceRequest = { ...req.body, userId }
-      const invoice = await createInvoice(handle, invoiceRequest)
+      const invoice = await createInvoice(token, invoiceRequest)
       res.status(201).json(invoice)
     } else if (req.method === 'GET') {
       const { status } = req.query
