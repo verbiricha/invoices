@@ -1,18 +1,12 @@
-# Strike OAuth Exmaple
+# Paymeinb.tc
 
-> Simple proof of concept that demonstrates Strike OAuth Connect
-
-- [Installation](#installation)
-- [Development](#development)
-- [Configuration](#configuration)
-- [Demo](#demo)
 
 ## Installation
 
 Install dependencies:
 
 ```sh
-npm install
+yarn
 ```
 
 ## Development
@@ -20,16 +14,19 @@ npm install
 This is a basic Next.js app. Run the development server:
 
 ```bash
-npm run dev
+yarn dev
 ```
 
 ## Configuration
 
-All configuration is done through environment variables. Default values are provided in [.env.development](https://github.com/mrfelton/strike-oauth-example/blob/master/.env.development) for development.
+All configuration is done through environment variables. Default values are provided in `.env.development` for development.
 
 Available options are:
 
-- `STRIKE_API_URL`  
+- `STRIKE_API_TOKEN`
+   Token for the Strike API
+
+- `STRIKE_API_URL`
    URL of the Strike API. e.g. https://api.strike.me/v1
 
 - `STRIKE_API_SCOPE`  
@@ -47,10 +44,12 @@ Available options are:
 - `NEXTAUTH_SECRET`  
    Secret used to encrypt the NextAuth.js JWT. e.g. jae6Yoox5eeMaewuzookeib5ieMoo9ce
 
+- `WEBHOOK_SECRET`
+   Secret used to sign webhook payload bodies coming from Strike.
+
+- `DATABASE_URL`
+  URL of Postgres database.
+
 ## Demo
 
-View a demo at: https://strike-oauth-example.vercel.app/
-
-_Note: this is connected to the `next` sandbox environment so you will need an account on that sandbox in order to login._
-
-<a href="https://strike-oauth-example.vercel.app/"><img width="836" alt="image" src="https://user-images.githubusercontent.com/200251/154948065-b21dfbce-b28d-4026-b7d4-de4c215df71a.png"></a>
+View a demo at: https://paymeinb.tc
