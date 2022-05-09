@@ -262,6 +262,8 @@ export const Invoices = ({ user }: InvoicesProps) => {
     fetchInvoices(status, page)
   }
 
+  const username = session?.user?.name && session.user.name.replace(/ .*/, '') || ''
+
   return (
     <>
       <Flex
@@ -275,7 +277,7 @@ export const Invoices = ({ user }: InvoicesProps) => {
         </Box>
         {session && session.user && (
           <UserDropdown
-            name={session.user.name || ""}
+            name={username}
             avatarUrl={user.avatarUrl}
             />
         )}
